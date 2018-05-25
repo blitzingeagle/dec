@@ -1,39 +1,4 @@
-FROM nvidia/cuda:7.0-cudnn4-devel
-
-# Install some dep packages
-
-ENV OPENCV_VERSION 2.4.12
-#ENV OPENCV_PACKAGES
-
-RUN apt-get update && \
-    apt-get install -y git wget build-essential unzip $OPENCV_PACKAGES && \
-    apt-get remove -y cmake && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Upgrade CMake
-
-RUN cd /usr/local/src && \
-    wget http://www.cmake.org/files/v3.5/cmake-3.5.1.tar.gz && \
-    tar xf cmake-3.5.1.tar.gz && \
-    cd cmake-3.5.1 && \
-    ./configure --prefix=/usr && \
-    make && \
-    make install
-
-# Install OpenCV
-
-RUN cd /usr/local/src && \
-    wget -O opencv-$OPENCV_VERSION.zip https://github.com/Itseez/opencv/archive/$OPENCV_VERSION.zip && \
-    unzip opencv-$OPENCV_VERSION.zip && \
-    cd opencv-$OPENCV_VERSION && \
-    mkdir build && \
-    cd build && \
-    cmake -D CMAKE_BUILD_TYPE=Release \
-          -D CMAKE_INSTALL_PREFIX=/usr \
-          -D BUILD_EXAMPLES=OFF \
-          -D CUDA_GENERATION=Auto \
-          -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_VTK=ON -D WITH_OPENGL=OFF -D WITH_QT=OFF .. && \
-    make && make install
+FROM bfolkens/docker-opencv:2.4.12-cuda7.0-cudnn4
 
 # Install some dep packages
 
@@ -44,7 +9,7 @@ ENV CAFFE_PACKAGES libprotobuf-dev libleveldb-dev libsnappy-dev libhdf5-serial-d
 
 RUN apt-get update && \
     apt-get install -y software-properties-common python-software-properties git wget build-essential pkg-config bc unzip cmake && \
-    add-apt-repository ppa:boost-latest/ppa && \
+    add-apt-repository ppa:boost-latest/ppa -y && \
     apt-get install -y $CAFFE_PACKAGES && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
